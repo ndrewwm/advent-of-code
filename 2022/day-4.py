@@ -26,13 +26,34 @@ def interval_contained(pair):
 
     return AinB or BinA
 
+def interval_overlaps(pair):
+    elfA, elfB = pair
+
+    intervalA = range(elfA[0], elfA[1] + 1)
+    intervalB = range(elfB[0], elfB[1] + 1)
+
+    # an elf might only be assigned 1 section
+    if elfA[0] == elfA[1]:
+        return elfA[0] in intervalB
+    if elfB[0] == elfB[1]:
+        return elfB[0] in intervalA
+    
+    # otherwise, check to see endpoint is in the opposite range
+    AinB = elfA[0] in intervalB or elfA[1] in intervalB
+    BinA = elfB[0] in intervalA or elfB[1] in intervalA
+
+    return AinB or BinA
+
 with open('day-4-input.txt') as file:
     lines = file.readlines()
     lines = [line.replace('\n', '') for line in lines]
 
-total = []
+contained = []
+overlaps = []
 for line in lines:
     pair = clean_assignments(line)
-    total += [interval_contained(pair)]
+    contained += [interval_contained(pair)]
+    overlaps += [interval_overlaps(pair)]
 
-sum(total)
+sum(contained)
+sum(overlaps)
