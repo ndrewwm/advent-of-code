@@ -8,7 +8,7 @@ def clean_assignments(pair):
 
     return [elfA, elfB]
 
-def interval_contained(pair):
+def check_overlaps(pair, check_contained = True):
     elfA, elfB = pair
 
     intervalA = range(elfA[0], elfA[1] + 1)
@@ -20,29 +20,14 @@ def interval_contained(pair):
     if elfB[0] == elfB[1]:
         return elfB[0] in intervalA
     
-    # otherwise, we check for nesting
-    AinB = elfA[0] in intervalB and elfA[1] in intervalB
-    BinA = elfB[0] in intervalA and elfB[1] in intervalA
+    # otherwise, check the end points
+    checkA = sum([point in intervalB for point in elfA])
+    checkB = sum([point in intervalA for point in elfB])
 
-    return AinB or BinA
-
-def interval_overlaps(pair):
-    elfA, elfB = pair
-
-    intervalA = range(elfA[0], elfA[1] + 1)
-    intervalB = range(elfB[0], elfB[1] + 1)
-
-    # an elf might only be assigned 1 section
-    if elfA[0] == elfA[1]:
-        return elfA[0] in intervalB
-    if elfB[0] == elfB[1]:
-        return elfB[0] in intervalA
-    
-    # otherwise, check to see endpoint is in the opposite range
-    AinB = elfA[0] in intervalB or elfA[1] in intervalB
-    BinA = elfB[0] in intervalA or elfB[1] in intervalA
-
-    return AinB or BinA
+    if check_contained:
+        return 2 in [checkA, checkB]
+    else:
+        return 1 in [checkA, checkB] or 2 in [checkA, checkB]
 
 with open('day-4-input.txt') as file:
     lines = file.readlines()
@@ -52,8 +37,8 @@ contained = []
 overlaps = []
 for line in lines:
     pair = clean_assignments(line)
-    contained += [interval_contained(pair)]
-    overlaps += [interval_overlaps(pair)]
+    contained += [check_overlaps(pair)]
+    overlaps += [check_overlaps(pair, check_contained = False)]
 
-sum(contained)
-sum(overlaps)
+sum(contained) # 431
+sum(overlaps) # 823
